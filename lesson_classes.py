@@ -1,45 +1,52 @@
-class A:
+import re
+import time
+import json
+import yaml
+import dicttoxml, xmltodict
 
-    def __init__(self):
-        super().__init__()
+from functools import partial
+from pprint import pprint as pp
 
-    def foo(self):
-        print('Hello from A.foo()')
+class timer():
+    def __init__(self, message):
+        self.message = message
 
+    def __enter__(self):
+        self.start = time.time()
+        return None
 
-class A1(A):
-    def __init__(self):
-        super().__init__()
-        self.attrA1 = 'attrA1'
-
-    def foo_a1(self):
-        print('foo_a1() called')
-
-
-class A2(A):
-    def __init__(self):
-        super().__init__()
-        self.attrA2 = 'attrA2'
-
-    def foo_a2(self):
-        print('foo_a2() called')
+    def __exit__(self, type, value, traceback):
+        elapsed_time = (time.time() - self.start) * 1000
+        print(self.message.format(elapsed_time))
 
 
-a1 = A1()
-a2 = A2()
-print(a1.attrA1)
-print(a2.attrA2)
-a1.foo()
-a2.foo()
+class Q:
 
-a1.foo_a1()
-a2.foo_a2()
+    def __init__(self, *, as_string='', **params):
+        self._params = params
+        self._as_string = as_string
 
-class B(A1, A2):
-    def __init__(self):
-        super().__init__()
-        self.attr1 = 'attrB'
-        self.attr2 = 'attr2B'
+    def __or__(self, other):
+        self._as_string = f'({str(self)} OR {str(other)})'
+        return self #Q(as_string=f'({str(self)} OR {str(other)})')
 
-b = B()
-print(b.__dict__)
+    def __and__(self, other):
+        return Q(as_string=f'({str(self)} AND {str(other)})')
+
+    def __invert__(self):
+        return Q(as_string=f'NOT {str(self)}')
+
+    def __str__(self):
+        result = ''
+        if self._as_string:
+            result = self._as_string
+        elif self._params:
+            result = [f'{k}={repr(v)}' for k, v in self._params.items()][0]
+        return result
+
+
+filter = (Q(first_name='J') | Q(last_name='J', telephone='+38000')) & ~Q(email='test@gmail.com')
+print(filter)
+
+filter = Q(first_name='J') | (Q(last_name='J', telephone='+38000') & ~Q(email='test@gmail.com'))
+print(filter)
