@@ -50,3 +50,9 @@ print(filter)
 
 filter = Q(first_name='J') | (Q(last_name='J', telephone='+38000') & ~Q(email='test@gmail.com'))
 print(filter)
+
+import logging
+
+logger = logging.getLogger(__name__)
+logger2 = logging.getLogger(__name__)
+print(id(logger), id(logger2))
