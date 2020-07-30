@@ -56,3 +56,43 @@ import logging
 logger = logging.getLogger(__name__)
 logger2 = logging.getLogger(__name__)
 print(id(logger), id(logger2))
+
+
+
+
+class Attribute:
+
+    def __init__(self, initval=None, name='var'):
+        self.val = initval
+        self.name = name
+
+    def __get__(self, obj, objtype):
+        print('Retrieving', self.name, id(obj))
+        return obj.__dict__[self.name]  # self.val
+
+    def __set__(self, obj, val):
+        print('Updating', self.name, id(obj))
+        self.val = val
+        obj.__dict__[self.name] = val
+
+    def __delete__(self, obj):
+        # print('Deleting', self.name, id(obj))
+        self.val = None
+
+
+class A:
+    attr = Attribute(name='attr')
+    # attr = 'DEMO'
+
+
+a = A()
+print(id(a))
+a.attr = 42
+print(a.attr)
+# del a.attr
+#
+# b = A()
+# print(id(b))
+# b.attr = 43
+# print(a.attr)
+# print(b.attr)
