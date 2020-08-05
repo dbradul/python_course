@@ -14,6 +14,8 @@ from multiprocessing.pool import ThreadPool
 from PIL import Image
 from io import BytesIO
 
+from typing import List
+
 class timer():
     def __init__(self, message):
         self.message = message
