@@ -172,23 +172,58 @@ def factorize_naive(n):
     assert False, "unreachable"
 
 # single-threaded version
-result = {}
+# result = {}
+result2 = []
 data = [n for n in range(1000000)]
+DATA_SIZE = 1000
+workers = 8
 
-with timer('Elapsed: {}s'):
-    for n in data:
-        result[n] = factorize_naive(n)
+queue = Queue(maxsize=1000)
+
+# with timer('Elapsed: {}s'):
+#     for n in data:
+#         result[n] = factorize_naive(n)
 
 # def factorize_numbers(lst):
 #     for n in lst:
 #         result[n] = factorize_naive(n)
 
 def factorize_number(n):
-    result[n] = factorize_naive(n)
+    # result[n] = factorize_naive(n)
+    return n, factorize_naive(n)
+    # queue.put((n, factorize_naive(n)))
 
-workers = 8
 with timer('Elapsed: {}s'):
     # with multiprocessing.Pool(workers) as pool:
     with ThreadPool(workers) as pool:
-        input_data = [n for n in range(1000000)] #[DATA_SIZE // workers for _ in range(workers)]
-        pool.map(factorize_number, input_data)
+        input_data = [n for n in range(DATA_SIZE)] #[DATA_SIZE // workers for _ in range(workers)]
+        result = pool.map(factorize_number, input_data)
+
+# def factorize_number2(queue, n):
+#     # result[n] = factorize_naive(n)
+#     queue.put((n, factorize_naive(n)))
+#
+# with timer('Elapsed: {}s'):
+#     with multiprocessing.Pool(workers) as pool:
+#     # with ThreadPool(workers) as pool:
+#         input_data = [n for n in range(DATA_SIZE)] #[DATA_SIZE // workers for _ in range(workers)]
+#         pool.map(partial(factorize_number2, queue=queue), input_data)
+
+# def factorize_number(input, result):
+#     chunk_number, data_size  = input
+#     chunk_offset = chunk_number * (DATA_SIZE // workers)
+#     for n in range(data_size):
+#         result[chunk_offset + n] = factorize_naive(chunk_offset + n)
+#
+#
+# with timer('Elapsed: {}s'):
+#     with multiprocessing.Pool(workers) as pool:
+#     # with ThreadPool(workers) as pool:
+#         input_data = [(i, DATA_SIZE // workers) for i in range(workers)] #[DATA_SIZE // workers for _ in range(workers)]
+#         pool.map(partial(factorize_number, result=result), input_data)
+
+# while not queue.empty():
+#     n, factors = queue.get()
+#     result[n] = factors
+
+print(result)
